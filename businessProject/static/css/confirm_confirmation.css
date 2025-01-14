@@ -1,0 +1,17 @@
+.table_design03 {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 700px;
+}
+
+.table_design03 th,
+.table_design03 td {
+    border-bottom: 2px solid #c1c7c6;
+    padding: 1em;
+}
+
+.table_design03 th {
+    border-bottom: 2px solid #4d9bc1;
+    font-weight: bold;
+    width: 30%;
+}

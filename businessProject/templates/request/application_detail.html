@@ -1,0 +1,376 @@
+{% extends "request/base.html" %}
+{% load static %}
+
+
+{% block title %}{{ application_type }}詳細{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                {% if user.is_staff %}
+                <h1 class="h3 mb-0 text-gray-800">{{ application_type }}申請処理</h1>
+                    {% if application.status == 'approved' %}
+                        <a href="{% url 'request:approving_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% else %}
+                        <a href="{% url 'request:unprocessing_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% endif %}
+                {% else %}
+                <h1 class="h3 mb-0 text-gray-800">{{ application_type }}詳細</h1>
+                    {% if application.status == 'pending' %}
+                        <a href="{% url 'request:pending_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% elif application.status == 'approved' %}
+                        <a href="{% url 'request:approving_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% elif application.status == 'rejected' %}
+                        <a href="{% url 'request:rejecting_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- 申請情報カード -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">申請情報</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>申請者</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ application.user.first_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>申請日時</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ application.updated_at|date:"Y/m/d H:i" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>ステータス</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge {% if application.status == 'rejected' %}bg-warning{% elif application.status == 'approved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if application_type == '住居・身上確認書' %}
+                        <!-- 住居・身上確認書固有のフィールド -->
+                        <div class="row g-3">
+                            
+                            <!-- 氏名 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">氏名</label>
+                                <input type="text" name="name" class="form-control" value="{{ application.name }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+        
+                            <!-- 氏名フリガナ -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">氏名フリガナ</label>
+                                <input type="text" name="name_kana" class="form-control" value="{{ application.name_kana }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+        
+                            <!-- 住所 -->
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">住所</label>
+                                <input type="text" name="address" id="address" class="form-control" value="{{ application.address }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+        
+                            <!-- 住所フリガナ -->
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">住所フリガナ</label>
+                                <input type="text" name="address_kana" class="form-control" value="{{ application.address_kana }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+                                
+                            <!-- 自転車通勤かどうか -->
+                            {% if application.is_bicycle_commute %}
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">自転車通勤の希望</label>
+                                <div class="d-flex justify-content-start">
+                                    <div class="custom-control custom-checkbox mb-3 no-pointer-events">
+                                        <input class="custom-control-input" id="isBicycleCommute" type="checkbox"
+                                            name="is_bicycle_commute" {% if application.is_bicycle_commute %}checked{% endif %}>
+                                        <label class="custom-control-label" for="isBicycleCommute">自転車通勤を希望する</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        
+                            <!-- 通勤経路 -->
+                            {% if application.commute_route %}
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">通勤経路</label>
+                                <textarea class="form-control w-100" id="commute_route" rows="3" readonly>{{ application.commute_route }}</textarea>
+                                {% if user.is_staff and application.status == 'approved' %}
+                                    <button class="btn btn-outline-primary mt-2" id="openCommuteRouteModalBtn">通勤経路をコピー</button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            <!-- 上記住所最寄駅までの交通手段 -->
+                            {% if not application.is_bicycle_commute %}
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">上記住所最寄駅までの交通手段</label>
+                                <div class="d-flex justify-content-start">
+                                    <div class="custom-control custom-radio mb-3">
+                                        <input type="radio" class="custom-control-input" checked>
+                                        <label class="custom-control-label">{{ application.get_transportation_type_display }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            <!-- バス経路 -->
+                            {% if application.bus_route %}
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">バス経路</label>
+                                <textarea class="form-control w-100" id="bus_route" rows="3" readonly>{{ application.bus_route }}</textarea>
+                                {% if user.is_staff and application.status == 'approved' %}
+                                    <button class="btn btn-outline-primary mt-2" id="openBusRouteModalBtn">バス経路をコピー</button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {% if application.commuting_expenses %}
+                            <!-- 6ヶ月定期券代 -->
+                            <div class="col-12 mb-4">
+                                <label class="form-label custom-confirmation-label">6ヶ月定期券代</label><br>
+                                <label class="form-label"><u>{{ application.commuting_expenses }}円</u></label>
+                            </div>
+                            {% endif %}
+
+                            <!-- 備考欄 -->
+                            <div class="col-12 mb-4">
+                                <label class="form-label">備考欄</label>
+                                <textarea class="form-control w-100" rows="3" readonly>{{ application.remarks }}</textarea>
+                            </div>
+
+                            {% if user.is_staff and route_check %}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert {% if route_check.is_valid %}alert-success{% else %}alert-warning{% endif %} mb-4">
+                                            <i class="fas {% if route_check.is_valid %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-2"></i>
+                                            {{ route_check.message }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-4">
+                                        <form id="actionForm" method="POST">
+                                            {% csrf_token %}
+                                            {% if not route_check.is_valid %}
+                                            <div class="mb-4">
+                                                <label for="comment" class="form-label">警告</label>
+                                                <textarea class="form-control custom-comment" id="comment" name="comment" rows="3">{{ route_check.message }}</textarea>
+                                            </div>
+                                            {% endif %}
+                                            <input type="hidden" name="action" id="action">
+                                            <div class="d-flex justify-content-start gap-2">
+                                                <button type="button" name="action" value="reject" class="btn btn-warning action-button">
+                                                    <i class="fas fa-undo me-1"></i>差し戻し
+                                                </button>
+                                                <button type="button" name="action" value="approve" class="btn btn-primary action-button">
+                                                    <i class="fas fa-check me-1"></i>承認
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% endif %}
+                            
+                    
+                        </div>
+                        
+                        
+                    {% elif application_type == '自転車通勤申請書' %}
+                        <!-- 自転車通勤申請書固有のフィールド -->
+                        <div class="row g-3">
+
+                            <!-- 申請日 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">申請日</label>
+                                <input type="date" name="application_date" class="form-control" value="{{ application.application_date|date:'Y-m-d' }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div> 
+
+                            <!-- 社員番号 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">社員番号</label>
+                                <input type="text" name="employee_number" class="form-control" value="{{ application.employee_number }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+                            
+                            <!-- 氏名 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">氏名</label>
+                                <input type="text" name="name" class="form-control" value="{{ application.name }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+
+                            <!-- 氏名フリガナ -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">氏名フリガナ</label>
+                                <input type="text" name="name_kana" class="form-control" value="{{ application.name_kana }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+
+                            <!-- 所属 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">所属</label>
+                                <input type="text" name="affiliation" class="form-control" value="{{ application.affiliation }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+
+                            <!-- 現住所 -->
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label custom-confirmation-label">現住所</label>
+                                <input type="text" name="current_address" class="form-control" value="{{ application.current_address }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+
+                            <!-- 支給額計 -->
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label custom-confirmation-label">支給額計</label>
+                                <input type="number" name="amount" class="form-control" value="{{ application.amount }}" {% if application.status != 'rejected' %}readonly{% endif %}>
+                            </div>
+
+                            <!-- 備考欄 -->
+                            <div class="col-12 mb-4">
+                                <label class="form-label">備考欄</label>
+                                <textarea class="form-control w-100" rows="3" readonly>{{ application.remarks }}</textarea>
+                            </div>
+
+                            {% if user.is_staff and route_check %}
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="alert {% if route_check.is_valid %}alert-success{% else %}alert-warning{% endif %} mb-4">
+                                            <i class="fas {% if route_check.is_valid %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-2"></i>
+                                            {{ route_check.message }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12 mb-4">
+                                        <form id="actionForm" method="POST">
+                                            {% csrf_token %}
+                                            {% if not route_check.is_valid %}
+                                            <div class="mb-4">
+                                                <label for="comment" class="form-label">警告</label>
+                                                <textarea class="form-control custom-comment" id="comment" name="comment" rows="3">{{ route_check.message }}</textarea>
+                                            </div>
+                                            {% endif %}
+                                            <input type="hidden" name="action" id="action">
+                                            <div class="d-flex justify-content-start gap-2">
+                                                <button type="button" name="action" value="reject" class="btn btn-warning action-button">
+                                                    <i class="fas fa-undo me-1"></i>差し戻し
+                                                </button>
+                                                <button type="button" name="action" value="approve" class="btn btn-primary action-button">
+                                                    <i class="fas fa-check me-1"></i>承認
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>  
+                        {% endif %}
+                    </div>
+                        
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-6">
+                            {% if previous_object %}
+                                {% if application_type == '住居・身上確認書' %}
+                                    <a href="{% url 'request:detail_confirmation' previous_object.pk %}" class="btn btn-primary">前へ</a>
+                                {% elif application_type == '自転車通勤申請書' %}
+                                    <a href="{% url 'request:detail_bicycle_commute' previous_object.pk %}" class="btn btn-primary">前へ</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-6 text-right">
+                            {% if next_object %}
+                                {% if application_type == '住居・身上確認書' %}
+                                    <a href="{% url 'request:detail_confirmation' next_object.pk %}" class="btn btn-primary">次へ</a>
+                                {% elif application_type == '自転車通勤申請書' %}
+                                    <a href="{% url 'request:detail_bicycle_commute' next_object.pk %}" class="btn btn-primary">次へ</a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                
+            </div>
+
+            
+        </div>
+    </div>
+</div>
+
+<!-- 経路検索モーダル -->
+<div class="modal fade bd-example-modal-lg" id="routeSearchModal" tabindex="-1" role="dialog"
+aria-labelledby="routeSearchModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="routeSearchModalTitle"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "request/route_parts.html" %}
+                <div id="mapArea" class="w-100 custom-hidden" style="height: 400px;"></div>
+                <!-- 経路を選択する -->
+                <div class="row mt-4 custom-hidden" id="routeSelectArea">
+                    <div class="col-md-4 offset-md-4">
+                        <button type="button" class="btn btn-default w-100" id="selectRouteBtn">経路選択</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 通勤経路コピー用モーダル -->
+<div class="modal fade" id="commuteRouteModal" tabindex="-1" aria-labelledby="commuteRouteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commuteRouteModalLabel">通勤経路のコピー</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <div class="modal-body" id="commuteRouteCopyList"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- バス経路コピー用モーダル -->
+  <div class="modal fade" id="busRouteModal" tabindex="-1" aria-labelledby="busRouteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="busRouteModalLabel">バス経路のコピー</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <div class="modal-body" id="busRouteCopyList"></div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
+{% block extra_script %}
+<script type="text/javascript" src="{% static 'js/confirmation.js' %}" charset="UTF-8"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript" src="{% static 'js/check_alert.js' %}" charset="UTF-8"></script>
+<script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script>
+<script type="text/javascript" src="{% static 'js/route_copy.js' %}" charset="UTF-8"></script>
+{% endblock %}

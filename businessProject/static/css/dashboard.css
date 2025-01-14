@@ -1,0 +1,54 @@
+/* アイコン背景のスタイルを更新 */
+.icon-wrapper {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* アイコンサイズも調整 */
+.icon-wrapper i {
+    font-size: 1.2rem;
+}
+
+/* ステータス別の背景色 */
+.bg-pending {
+    background: linear-gradient(145deg, #4e73df30, #4e73df15);
+}
+
+.bg-revision {
+    background: linear-gradient(145deg, #f6c23e30, #f6c23e15);
+}
+
+.bg-approved {
+    background: linear-gradient(145deg, #1cc88a30, #1cc88a15);
+}
+
+.bg-rejected {
+    background: linear-gradient(145deg, #e74a3b30, #e74a3b15);
+}
+
+/* 既存のスタイルは維持 */
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-menu {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.btn-primary {
+    border-radius: 0.5rem;
+}

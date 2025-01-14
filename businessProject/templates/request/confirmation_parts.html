@@ -1,0 +1,136 @@
+
+<!-- フォーム部分 -->
+<form method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="row g-3">
+
+        <!-- 氏名 -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.name.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.name.label }}</label>
+            {{ form.name }}
+        </div>
+
+        <!-- 氏名フリガナ -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.name_kana.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.name_kana.label }}</label>
+            {{ form.name_kana }}
+        </div>
+
+        <!-- 住所 -->
+        <div class="col-12 mb-4">
+            <label for="{{ form.address.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.address.label }}</label>
+            {{ form.address }}
+        </div>
+
+        <!-- 住所フリガナ -->
+        <div class="col-12 mb-4">
+            <label for="{{ form.address_kana.id_for_label }}"
+                class="form-label custom-confirmation-label">{{ form.address_kana.label }}</label>
+            {{ form.address_kana }}
+        </div>
+
+        <!-- 自転車通勤かどうか -->
+        <div class="col-12 mb-4">
+            <label class="form-label custom-confirmation-label">自転車通勤の希望</label>
+            <div class="d-flex justify-content-start">
+                <div class="custom-control custom-checkbox mb-3">
+                    <input class="custom-control-input" id="isBicycleCommute" type="checkbox"
+                        name="is_bicycle_commute">
+                    <label class="custom-control-label" for="isBicycleCommute">自転車通勤を希望する</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="train_input_area" class="col-12">
+            <!-- 通勤経路 -->
+            <label for="{{ form.commute_route.id_for_label }}"
+                class="form-label custom-confirmation-label">{{ form.commute_route.label }}</label><br>
+            <label>上記住所最寄駅から会社（東西線 東陽町駅）までの経路 （駅名、路線名、乗換含む）</label>
+
+            <!-- 経路探索ボタン -->
+            <div class="mb-3">
+                <button type="button" id="searchRouteModalOpen" class="btn btn-secondary">
+                    <i class="fa fa-train" aria-hidden="true"></i>経路検索
+                </button>
+            </div>
+
+            <!-- 通勤経路入力エリア（初期状態は非表示） -->
+            <div id="routeInputArea">
+                {{ form.commute_route }}
+                <div id="trainPriceArea"></div>
+            </div>
+            {% if form.commute_route.errors %}
+            <div class="text-danger">
+                {% for error in form.commute_route.errors %}
+                <span>{{ error }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <!-- 通勤経路JSON -->
+            {{ form.route_json }}
+
+            <!-- 経済路線JSON -->
+            {{ form.economic_route_json }}
+
+
+            <!-- 上記住所最寄駅までの交通手段-->
+            <div class="mt-4">
+                <label class="form-label custom-confirmation-label">上記住所最寄駅までの交通手段</label>
+                <div class="d-flex justify-content-start">
+                    {% for choice in form.transportation_type.field.choices %}
+                    <div class="custom-control custom-radio mb-3 mr-3">
+                        <input 
+                            type="radio" 
+                            id="{{ choice.0 }}" 
+                            name="transportation_type" 
+                            value="{{ choice.0 }}" 
+                            class="custom-control-input" 
+                            {% if choice.0 == form.transportation_type.value %}checked{% endif %}>
+                        <label class="custom-control-label" for="{{ choice.0 }}">{{ choice.1 }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- バス経路 -->
+            <div class="mb-4 {% if form.transportation_type.value != 'bus' %}custom-hidden{% endif %}" id="busRouteInputAreaDiv">
+                <label for="busRoute" class="form-label">上記最寄駅までバス使用する場合、または自転車が認められない場合の経路
+                    （駅名、バス路線名）</label>
+
+                <!-- バス経路探索ボタン -->
+                <div class="mb-3">
+                    <button type="button" id="searchBusRouteModalOpen" class="btn btn-secondary">
+                        <i class="fa fa-bus" aria-hidden="true"></i>バス経路検索
+                    </button>
+                </div>
+
+                <!-- バス経路入力エリア（初期状態は非表示） -->
+                <div id="busRouteInputArea">
+                    {{ form.bus_route }}
+                    <div id="busPriceArea"></div>
+                </div>
+            </div>
+            <!-- バス経路JSON -->
+            {{ form.bus_route_json }}
+
+            <!-- 定期券代 -->
+            {{ form.commuting_expenses }}
+        </div>
+        <!-- 備考欄 -->
+        <div class="col-12 mb-4">
+            <label for="{{ form.remarks.id_for_label }}"
+                class="form-label custom-confirmation-label">{{ form.remarks.label }}</label>
+            {{ form.remarks }}
+        </div>
+        <!-- 送信ボタン -->
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary" name="next" value="confirm">確認する</button>
+        </div>
+    </div>
+</form>
+
+

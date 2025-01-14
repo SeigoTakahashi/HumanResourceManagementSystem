@@ -1,0 +1,117 @@
+{% extends "request/base.html" %}
+{% load static %}
+
+
+{% block title %}{{ application_type }}修正{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                {% if user.is_staff %}
+                <h1 class="h3 mb-0 text-gray-800">{{ application_type }}申請処理</h1>
+                    <a href="{% url 'request:unprocessing_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                {% else %}
+                <h1 class="h3 mb-0 text-gray-800">{{ application_type }}修正</h1>
+                    {% if application.status == 'pending' %}
+                        <a href="{% url 'request:pending_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% elif application.status == 'approved' %}
+                        <a href="{% url 'request:approving_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% elif application.status == 'rejected' %}
+                        <a href="{% url 'request:rejecting_list' %}" class="btn btn-secondary">一覧に戻る</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <!-- 申請情報カード -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">申請情報</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>申請者</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ application.user.first_name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>申請日時</strong>
+                        </div>
+                        <div class="col-md-8">
+                            {{ application.updated_at|date:"Y/m/d H:i" }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <strong>ステータス</strong>
+                        </div>
+                        <div class="col-md-8">
+                            <span class="badge {% if application.status == 'rejected' %}bg-warning{% elif application.status == 'approved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ application.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if application_type == '住居・身上確認書' %}
+                    <!-- 住居・身上確認書固有のフィールド -->
+                        {% include "request/confirmation_parts.html" %}
+                    {% elif application_type == '自転車通勤申請書' %}
+                    <!-- 自転車通勤申請書固有のフィールド -->
+                        {% include "request/bicycle_commute_parts.html" %}
+                    {% endif %}
+
+                    <!-- フォームの値を保持するための隠しフォーム -->
+                    <form id="updateForm" method="POST">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            {{ field.as_hidden }}
+                        {% endfor %}
+                    </form>
+
+                </div>
+                
+            </div>
+
+            
+            
+        </div>
+    </div>
+</div>
+
+<!-- 経路検索モーダル -->
+<div class="modal fade bd-example-modal-lg" id="routeSearchModal" tabindex="-1" role="dialog"
+aria-labelledby="routeSearchModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="routeSearchModalTitle"></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% include "request/route_parts.html" %}
+                <div id="mapArea" class="w-100 custom-hidden" style="height: 400px;"></div>
+                <!-- 経路を選択する -->
+                <div class="row mt-4 custom-hidden" id="routeSelectArea">
+                    <div class="col-md-4 offset-md-4">
+                        <button type="button" class="btn btn-default w-100" id="selectRouteBtn">経路選択</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block extra_script %}
+<script type="text/javascript" src="{% static 'js/confirmation.js' %}" charset="UTF-8"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript" src="{% static 'js/check_alert.js' %}" charset="UTF-8"></script>
+{% endblock %}

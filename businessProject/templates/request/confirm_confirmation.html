@@ -1,0 +1,95 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% block title %}住居・身上確認書{% endblock %}
+{% block extra_css %}
+<link class="css" rel="stylesheet" type="text/css" href="{% static 'css/confirm_confirmation.css' %}">
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">住居・身上確認書 確認画面</h1>
+            </div>
+
+            <table class="ui celled table table table-hover table_design03">
+                <tr>
+                    <th>名前</th>
+                    <td>{{form.name.value}}</td>
+                </tr>
+                <tr>
+                    <th>名前フリガナ</th>
+                    <td>{{form.name_kana.value}}</td>
+                </tr>
+                <tr>
+                    <th>住所</th>
+                    <td>{{form.address.value}}</td>
+                </tr>
+                <tr>
+                    <th>住所フリガナ</th>
+                    <td>{{form.address_kana.value}}</td>
+                </tr>
+                {% if form.is_bicycle_commute.value %}
+                <tr>
+                    <th>自転車通勤の希望</th>
+                    <td>自転車通勤を希望する</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <th>通勤経路</th>
+                    <td>{{form.commute_route.value}}</td>
+                </tr>
+                <tr>
+                    <th>最寄駅までの交通手段</th>
+                    <td>
+                        {% for choice in form.transportation_type.field.choices %}
+                        {% if choice.0 == form.transportation_type.value %}
+                        {{ choice.1 }}
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% if form.transportation_type.value == 'bus' %}
+                <tr>
+                    <th>バス経路</th>
+                    <td>{{ form.bus_route.value }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>6ヶ月定期券代</th>
+                    <td>{{ form.commuting_expenses.value }}円</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>備考欄</th>
+                    <td>{{ form.remarks.value }}</td>
+                </tr>
+                {% if error_message %}
+                <tr>
+                    <th>警告</th>
+                    <td style="color:red">{{ error_message }}</td>
+                </tr>
+                {% endif %}
+            </table>
+            
+            <form class="ui form" action="{% if is_update %}{% url 'request:update_confirmation' pk=application_pk %}{% else %}{% url 'request:confirmation' %}{% endif %}" method="POST">
+                {% csrf_token %}
+                {% for field in form %}
+                {{field.as_hidden}}
+                {% endfor %}
+                <button class="btn btn-secondary" type="submit" name="next" value="back">戻る</button>
+                <button class="btn btn-primary" type="submit" name="next" value="create">作成する</button>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+{% block extra_script %}
+
+{% endblock %}

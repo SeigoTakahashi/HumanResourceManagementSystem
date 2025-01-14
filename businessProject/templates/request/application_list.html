@@ -1,0 +1,185 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% load application_filters %}
+{% block title %}
+    {% if user.is_staff %}
+        {% if request.resolver_match.url_name == 'unprocessing_list' %}
+            未処理一覧
+        {% elif request.resolver_match.url_name == 'approving_list' %}
+            承認済み一覧
+        {% endif %}
+    {% else %}
+        {% if request.resolver_match.url_name == 'pending_list' %}
+            申請中一覧
+        {% elif request.resolver_match.url_name == 'rejecting_list' %}
+            差し戻し一覧
+        {% elif request.resolver_match.url_name == 'approving_list' %}
+            承認済み一覧
+        {% endif %}
+    {% endif %}
+{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-8">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    {% if user.is_staff %}
+                        {% if request.resolver_match.url_name == 'unprocessing_list' %}
+                            未処理一覧
+                        {% elif request.resolver_match.url_name == 'approving_list' %}
+                            承認済み一覧
+                        {% endif %}
+                    {% else %}
+                        {% if request.resolver_match.url_name == 'pending_list' %}
+                            申請中一覧
+                        {% elif request.resolver_match.url_name == 'rejecting_list' %}
+                            差し戻し一覧
+                        {% elif request.resolver_match.url_name == 'approving_list' %}
+                            承認済み一覧
+                        {% endif %}
+                    {% endif %}
+                </h1>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">ダッシュボードに戻る</a>
+            </div>
+
+            {% if applications %}
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="applicationTable" class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>申請種類</th>
+                                    <th>申請者</th>
+                                    <th>ステータス</th>
+                                    <th>更新日時</th>
+                                    {% if user.is_staff and request.resolver_match.url_name == 'approving_list' %}
+                                        <th>入社日</th>
+                                    {% endif %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for application in applications %}
+                                {% if application.status != 'rejected' %}
+                                <tr class="clickable-row" style="cursor: pointer;" 
+                                data-href="{% if application|class_name == 'Confirmation' %}
+                                              {% url 'request:detail_confirmation' application.id %}
+                                            {% elif application|class_name == 'BicycleCommute' %}
+                                              {% url 'request:detail_bicycle_commute' application.id %}
+                                            {% endif %}">
+                                {% else %}
+                                <tr class="clickable-row" style="cursor: pointer;"
+                                data-href="{% if application|class_name == 'Confirmation' %}
+                                              {% url 'request:update_confirmation' application.id %}
+                                            {% elif application|class_name == 'BicycleCommute' %}
+                                              {% url 'request:update_bicycle_commute' application.id %}
+                                            {% endif %}">
+                                {% endif %}
+                                    <td>
+                                        {% if application|class_name == 'Confirmation' %}
+                                            <i class="fas fa-id-card me-2"></i> 住居・身上確認書
+                                        {% elif application|class_name == 'BicycleCommute' %}
+                                            <i class="fa fa-bicycle me-2"></i> 自転車通勤申請書
+                                        {% elif application|class_name == 'ExpenseReport' %}
+                                            <i class="fas fa-receipt me-2"></i> 経費精算
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ application.user.first_name }}</td>
+                                    <td>
+                                        <span class="badge {% if application.status == 'rejected' %}bg-warning{% elif application.status == 'approved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                            {{ application.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ application.updated_at|date:"Y/m/d H:i" }}</td>
+                                    {% if user.is_staff and request.resolver_match.url_name == 'approving_list' %}
+                                        <td>
+                                            {{ application.user.date_of_joining|date:"Y/m/d" }}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {% if user.is_staff %}
+                        {% if request.resolver_match.url_name == 'unprocessing_list' %}
+                            未処理の書類はありません。
+                        {% elif request.resolver_match.url_name == 'approving_list' %}
+                            承認済みの書類はありません。
+                        {% endif %}
+                    {% else %}
+                        {% if request.resolver_match.url_name == 'pending_list' %}
+                            申請中の書類はありません。
+                        {% elif request.resolver_match.url_name == 'rejecting_list' %}
+                            差し戻しの書類はありません。
+                        {% elif request.resolver_match.url_name == 'approving_list' %}
+                            承認済みの書類はありません。
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block extra_script %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.7/css/buttons.bootstrap5.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.7/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.7/js/buttons.bootstrap5.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.7/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.3.7/js/buttons.print.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('#applicationTable').DataTable({
+            "language": {
+                "sEmptyTable":     "テーブルにデータがありません",
+                "sInfo":           " _TOTAL_ 件中 _START_ から _END_ まで表示",
+                "sInfoEmpty":      " 0 件中 0 から 0 まで表示",
+                "sInfoFiltered":   "（全 _MAX_ 件より抽出）",
+                "sInfoPostFix":    "",
+                "sInfoThousands":  ",",
+                "sLengthMenu":     "_MENU_ 件表示",
+                "sLoadingRecords": "読み込み中...",
+                "sProcessing":     "処理中...",
+                "sSearch":         "検索:",
+                "sZeroRecords":    "一致するレコードがありません",
+                "oPaginate": {
+                    "sFirst":    "先頭",
+                    "sLast":     "最終",
+                    "sNext":     "次へ",
+                    "sPrevious": "前へ"
+                }
+            },
+            "pageLength": 10,
+            "order": [[3, "desc"]],
+            "columnDefs": [
+                { "orderable": true, "targets": "_all" }
+            ]
+            
+        });
+        $('#applicationTable').on('click', 'tr.clickable-row', function() {
+            window.location = $(this).data('href');
+        });
+    });
+</script>
+{% endblock %}

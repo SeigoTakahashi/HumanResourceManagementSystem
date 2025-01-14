@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+}
+
+.custom-label {
+    background-color: #0056b3;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.input-group-text {
+    border: 1px solid #0056b3;
+}
+
+.form-control {
+    border: 1px solid #0056b3;
+}
+
+.custom-icon {
+    cursor: pointer;
+}
+
+.custom-input {
+    color: #333333;
+}
+
+.custom-input:focus {
+    outline: none;
+    border-color: #0056b3;
+    color: black;
+}
+
+.custom-input:focus::placeholder {
+    color: transparent;
+}
+
+.form-control {
+    background-color: #fff;  
+    opacity: 1;  
+    color: #333333;
+}
+.form-control[readonly] {
+    background-color: #fff;  
+    opacity: 1;  
+    color: #333333;
+}
+
+.custom-comment {
+    background-color: #fff;  
+    opacity: 1;  
+    color: #333333;
+}
+
+.no-pointer-events {
+    pointer-events: none;
+}
+
+
+
+
+@media (max-width: 576px) {
+    .custom-icon {
+        margin: 18px 0;
+        font-size: 24px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .custom-icon {
+        margin: 18px 0;
+        font-size: 24px;
+    }
+}
+
+#detailSetting {
+    display: none;
+    overflow: hidden;
+    transition: max-height 1s ease, opacity 1s ease;
+}
+
+#detailSetting.detail-show {
+    display: block;
+}
+
+.custom-plus-icon {
+    color: black;
+    cursor: pointer;
+}
+
+.custom-show {
+    display: block;
+}
+
+.custom-hidden {
+    display: none;
+}
+
+.suggestions {
+    max-height: 150px;
+    overflow-y: auto;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    left: 0;
+    z-index: 1000;
+    top: 100%;
+    border: 1px solid #ddd;
+}
+
+.suggestion-item {
+    padding: 8px;
+    cursor: pointer;
+    font-size: smaller;
+    text-align: left;
+    border: 0.5px solid #ddd;
+}
+
+.suggestion-item:hover {
+    background-color: #f0f0f0;
+}
+
+.form-group {
+    position: relative;
+}
+
+#mapArea {
+    width: 500px;
+    height: 300px;
+    margin: 0 auto;
+}
+
+.custom-confirmation-label {
+    font-weight: bold;
+}
+
+.custom-container {
+    background-color: #F5F5F5;
+}
+
+.custom-file {
+    cursor: pointer;
+    color:#333333;
+}
+.custom-file:hover {
+    color:#6c757d;
+    text-decoration: underline;
+}
+
+.navbar {
+    z-index: 1000; 
+}
+
+.modal {
+    z-index: 1100; 
+}
+

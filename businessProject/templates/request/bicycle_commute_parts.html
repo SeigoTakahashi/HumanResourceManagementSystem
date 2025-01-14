@@ -1,0 +1,68 @@
+
+<!-- フォーム部分 -->
+<form method="POST">
+    {% csrf_token %}
+    <div class="row g-3">
+
+        <!-- 申請日 -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.application_date.id_for_label }}" class="form-label custom-confirmation-label">{{ form.application_date.label }}</label>
+            {{ form.application_date }}
+        </div>
+
+        <!-- 社員番号 -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.employee_number.id_for_label }}" class="form-label custom-confirmation-label">{{ form.employee_number.label }}</label>
+            {{ form.employee_number }}
+        </div>
+
+        <input type="hidden" id="userId" value="{{ userId }}">
+
+        <!-- 氏名 -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.name.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.name.label }}</label>
+            {{ form.name }}
+        </div>
+
+        <!-- 氏名フリガナ -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.name_kana.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.name_kana.label }}</label>
+            {{ form.name_kana }}
+        </div>
+
+        <!-- 所属 -->
+        <div class="col-md-6 mb-4">
+            <label for="{{ form.affiliation.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.affiliation.label }}</label>
+            {{ form.affiliation }}
+        </div>
+
+        <input type="hidden" id="employee_type" value="{{ employee_type }}">
+        <!-- 現住所 -->
+        <div class="col-md-12 mb-4">
+            <label for="{{ form.current_address.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.current_address.label }}</label>
+            {{ form.current_address }}
+        </div>
+
+        <!-- 支給額計 -->
+        <div class="col-md-6 mb-4" id="amountArea">
+            <label for="{{ form.amount.id_for_label }}" class="form-label custom-confirmation-label">
+                {{ form.amount.label }}</label>
+            {{ form.amount }}
+        </div>
+
+        <!-- 備考欄 -->
+        <div class="col-12 mb-4">
+            <label for="{{ form.remarks.id_for_label }}"
+                class="form-label custom-confirmation-label">{{ form.remarks.label }}</label>
+            {{ form.remarks }}
+        </div>
+        <!-- 送信ボタン -->
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary" name="next" value="confirm">確認する</button>
+        </div>
+    </div>
+</form>

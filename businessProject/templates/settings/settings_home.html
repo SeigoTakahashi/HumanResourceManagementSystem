@@ -1,0 +1,41 @@
+{% extends "settings/base.html" %}
+{% load static %}
+{% block settings_content %}
+<style>
+    .badge {
+        text-transform: none !important;
+    }
+</style>
+<h5 class="text-start mb-4"><i class="fas fa-user-circle me-2"></i> ユーザー情報</h5>
+<div class="row mb-4 justify-content-center">
+    <div class="col-md-12"> <!-- カードを横いっぱいに広げる -->
+        <!-- ユーザー基本情報 -->
+        <div class="card shadow-sm w-100" style="background-color: #ffffff;">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-start">
+                        <strong>ID:</strong> 
+                        <span class="badge bg-secondary">{{ user.username }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-start">
+                        <strong>名前:</strong> 
+                        <span class="badge bg-secondary">{{ user.first_name }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-start">
+                        <strong>メールアドレス:</strong> 
+                        <span class="badge bg-secondary">{{ user.email }}</span> <!-- メールアドレスはそのまま表示 -->
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-start">
+                        <strong>社員属性:</strong> 
+                        <span class="badge bg-secondary">{{ user.employee_type }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center text-start">
+                        <strong>入社日:</strong> 
+                        <span class="badge bg-secondary">{{ user.date_of_joining|date:"Y年m月d日" }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

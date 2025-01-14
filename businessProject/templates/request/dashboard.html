@@ -1,0 +1,193 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% block title %}申請ダッシュボード{% endblock %}
+{% block content %}
+
+<div class="container-fluid px-4 py-4">
+    <!-- ヘッダー部分 -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">ダッシュボード</h1>
+    </div>
+
+    <!-- ステータス別カード -->
+    <div class="row g-4">
+        {% if user.is_staff %}
+        <!-- 管理者の場合 -->
+        <!-- 未処理 -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:unprocessing_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-pending">
+                                    <i class="fa fa-exclamation-circle fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">未処理</h6>
+                                <h2 class="mb-0 fw-bold">{{ unprocessing_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 承認済み -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:approving_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-approved">
+                                    <i class="fas fa-check fa-2x text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">承認済み</h6>
+                                <h2 class="mb-0 fw-bold">{{ approved_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- 未提出 -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:unsubmitted_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-revision">
+                                    <i class="fas fa-user-clock fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">未提出</h6>
+                                <h2 class="mb-0 fw-bold">{{ unsubmitted_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% else %}
+        <!-- 申請待ち -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:pending_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-pending">
+                                    <i class="fas fa-clock fa-2x text-primary"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">申請中</h6>
+                                <h2 class="mb-0 fw-bold">{{ pending_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 差し戻し -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:rejecting_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-revision">
+                                    <i class="fas fa-redo fa-2x text-warning"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">差し戻し</h6>
+                                <h2 class="mb-0 fw-bold">{{ rejected_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 承認済み -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:approving_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-approved">
+                                    <i class="fas fa-check fa-2x text-success"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">承認済み</h6>
+                                <h2 class="mb-0 fw-bold">{{ approved_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 未申請 -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <a href="{% url 'request:unsubmitted_list' %}" class="text-decoration-none">
+                <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <div class="icon-wrapper bg-rejected">
+                                    <i class="fas fa-ban fa-2x text-danger"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-4">
+                                <h6 class="text-muted mb-1">未申請</h6>
+                                <h2 class="mb-0 fw-bold">{{ unsubmitted_count|default:"0" }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+    <!-- 申請 -->
+    <div class="row g-4 mt-3">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-0 shadow h-100" style="transition: transform 0.2s ease-in-out;">
+                <div class="card-header bg-light text-white">
+                    <h5 class="mb-0 text-dark">申請一覧</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'request:confirmation' %}" class="custom-file">
+                        <i class="fa fa-file-text fa-fw" aria-hidden="true"></i>住居・身上確認書
+                    </a>
+                    <br>
+                    <a href="{% url 'request:bicycle_commute' %}" class="custom-file">
+                        <i class="fa fa-file-text fa-fw" aria-hidden="true"></i>自転車通勤申請書
+                    </a>
+                    <br>
+                    <a href="#" class="custom-file">
+                        <i class="fa fa-file-text fa-fw" aria-hidden="true"></i>出張費申請書
+                    </a>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+
+
+
+{% endblock %}

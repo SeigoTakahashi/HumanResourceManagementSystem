@@ -1,0 +1,29 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% block title %}メッセージフォーム{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">新しいメッセージを送信</h2>
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="recipient" class="form-label">送信先</label>
+            <select name="recipient" class="form-select" required>
+                {% for join_date, users in users_by_join_date.items %}
+                    <optgroup label="{% if join_date == '未設定' %}未設定{% else %}{{ join_date|date:'Y年m月d日' }}{% endif %}">
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.first_name }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">メッセージ</label>
+            <textarea name="content" class="form-control" rows="5" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">送信</button>
+    </form>
+</div>
+{% endblock %}

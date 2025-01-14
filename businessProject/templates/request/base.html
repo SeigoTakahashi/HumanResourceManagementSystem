@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Icon -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="{% static 'css/nucleo-icons.css' %}" rel="stylesheet">
+    <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Argon CSS -->
+    <link type="text/css" href="{% static '/css/argon-design-system.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/css/perfect-scrollbar.min.css">
+
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+    <!-- Original CSS -->
+    <link class="css" rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+    <!-- Original JS -->
+    <script type="text/javascript" src="{% static 'js/script.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'js/route.js' %}" charset="UTF-8"></script>
+    <script type="text/javascript" src="{% static 'js/map.js' %}" charset="UTF-8"></script>
+
+    <!-- GUI CSS -->
+    <link class="css" rel="stylesheet" type="text/css" href="{% static 'expGuiCourse/expCss/expGuiCourse.css' %}">
+
+    <!-- GUI JS -->
+    <script type="text/javascript" src="{% static 'expGuiCourse/expGuiCourse.js' %}" charset="UTF-8"></script>
+
+    <!-- Dashboard CSS -->
+    <link class="css" rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+    
+
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+<body>
+    <!-- ナビゲーションバー -->
+    {% block navbar %}
+    <div class="sticky-top">
+        <nav class="navbar navbar-icon-top navbar-expand-lg navbar-dark bg-dark w-100">
+            <a class="navbar-brand disabled text-white">Navbar</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+    
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fa fa-home"></i>
+                            ダッシュボード
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'route' %}">
+                            <i class="fa fa-train fa-lg"></i>
+                            経路検索
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'message:message_list' %}">
+                            <i class="fa fa-commenting fa-lg position-relative" aria-hidden="true">
+                                {% if unread_messages_count > 0 %}
+                                <span
+                                    class="position-absolute bottom-0 end-0 translate-middle-x translate-middle-y badge rounded-pill bg-danger"
+                                    style="border-radius: 50% !important; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; transform: translate(50%, 80%);">{{ unread_messages_count }}</span>
+                                {% endif %}
+                            </i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notification:dashboard' %}">
+                            <i class="fa fa-bell fa-lg position-relative">
+                                {% if unread_notifications_count > 0 %}
+                                <span
+                                    class="position-absolute bottom-0 end-0 translate-middle-x translate-middle-y badge rounded-pill bg-danger"
+                                    style="border-radius: 50% !important; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; transform: translate(50%, 80%);">{{ unread_notifications_count }}</span>
+                                {% endif %}
+                            </i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa fa-user fa-lg"></i>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            {% if user.is_authenticated %}
+                            <!-- 認証済みの場合の処理 -->
+                            <div class="dropdown-item" style="cursor: pointer;">
+                                <strong>{{ user.username }}</strong>
+                                <small class="text-muted d-block">{{ user.email }}</small>
+                            </div>
+                            <a class="dropdown-item" href="javascript:logoutMenu.submit()"><i
+                                    class="fa fa-sign-out fa-lg"></i>ログアウト</a>
+                            <form action='{% url "accounts:logout" %}' method='post' name='logoutMenu'
+                                style="display: none;">
+                                {% csrf_token %}
+                            </form>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'settings:settings_home' %}"><i
+                                    class="fa fa-cog fa-lg"></i>設定</a>
+                            {% if user.is_staff %}
+                            <a class="dropdown-item" href="{% url 'admin:index' %}"><i
+                                    class="fa fa-users fa-lg"></i>管理画面</a>
+                            {% endif %}
+                            {% else %}
+                            <!-- 認証済みでない場合の処理 -->
+                            <a class="dropdown-item" href="{% url 'accounts:login' %}"><i
+                                    class="fa fa-sign-in fa-lg"></i>ログイン</a>
+                            {% endif %}
+                        </div>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+    
+    {% endblock %}
+    {% block content %}{% endblock %}
+
+    <!-- Core -->
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+    <!-- Argon JS -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery.perfect-scrollbar/1.5.5/js/perfect-scrollbar.min.js"></script>
+    <script src="{% static 'js/argon-design-system.js' %}"></script>
+    {% block extra_script %}{% endblock %}
+
+</body>
+
+</html>

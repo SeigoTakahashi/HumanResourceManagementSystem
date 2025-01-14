@@ -1,0 +1,261 @@
+<!-- メインコンテナ -->
+<div class="container custom-container p-4 rounded shadow-sm">
+    <!-- アラート -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-warning custom-hidden" role="alert" id="departureAlert">出発地を入力してください</div>
+            <div class="alert alert-warning custom-hidden" role="alert" id="arrivalAlert">到着地を入力してください</div>
+            <div class="alert alert-warning custom-hidden" role="alert" id="missAlert">経路検索に失敗しました</div>
+        </div>
+    </div>
+
+    <!-- 出発・到着駅入力 -->
+    <div class="row mb-4">
+        <div class="col-md-5">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text custom-label">出発</span>
+                    </div>
+                    <input type="text" class="form-control custom-input stationInput" placeholder=" 駅名・バス停名"
+                        id="departureInput" autocomplete="off">
+                </div>
+                <div class="suggestions custom-hidden"></div>
+                <input type="hidden" id="departureCode" class="hiddenInput">
+            </div>
+        </div>
+
+        <div class="col-md-2 d-flex justify-content-center align-items-center my-3 my-md-0" id="swapButtonDiv">
+            <button class="btn btn-outline-secondary" id="swapButton">
+                <i class="fa fa-exchange"></i>
+            </button>
+        </div>
+
+        <div class="col-md-5">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text custom-label">到着</span>
+                    </div>
+                    <input type="text" class="form-control custom-input stationInput" placeholder=" 駅名・バス停名"
+                        id="arrivalInput" autocomplete="off">
+                </div>
+                <div class="suggestions custom-hidden"></div>
+                <input type="hidden" id="arrivalCode" class="hiddenInput">
+            </div>
+        </div>
+    </div>
+
+    <!-- 経由駅入力 -->
+    <div class="row mb-4" id="viaArea">
+        <div class="col-md-6 offset-md-3">
+            <!-- 経由1 -->
+            <div class="form-group">
+                <div class="input-group mb-1" id="via1InputGroup">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text custom-label">経由1</span>
+                    </div>
+                    <input type="text" class="form-control custom-input stationInput" placeholder=" 駅名・バス停名"
+                        autocomplete="off">
+                    <div class="input-group-append">
+                        <span class="input-group-text">
+                            <i class="fa fa-plus-square fa-xl custom-plus-icon" onclick="showNextViaField(1)"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="suggestions custom-hidden"></div>
+                <input type="hidden" id="via1Code" class="hiddenInput">
+            </div>
+            <!-- 経由2 -->
+            <div class="form-group">
+                <div class="input-group mb-1 custom-hidden" id="via2InputGroup">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text custom-label">経由2</span>
+                    </div>
+                    <input type="text" class="form-control custom-input stationInput" placeholder=" 駅名・バス停名"
+                        autocomplete="off">
+                    <div class="input-group-append">
+                        <span class="input-group-text">
+                            <i class="fa fa-plus-square fa-xl custom-plus-icon" onclick="showNextViaField(2)"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="suggestions custom-hidden"></div>
+                <input type="hidden" id="via2Code" class="hiddenInput">
+            </div>
+            <div class="form-group">
+                <div class="input-group mb-1 custom-hidden" id="via3InputGroup">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text custom-label">経由3</span>
+                    </div>
+                    <input type="text" class="form-control custom-input stationInput" placeholder=" 駅名・バス停名"
+                        autocomplete="off">
+                </div>
+                <div class="suggestions custom-hidden"></div>
+                <input type="hidden" id="via3Code" class="hiddenInput">
+            </div>
+        </div>
+    </div>
+
+    <!-- 日時選択 -->
+    <div class="row mb-4" id="dateSelectDiv">
+        <div class="col-12">
+            <label>日時</label>
+            <select class="form-select w-auto" id="yearSelect"></select>
+            <select class="form-select w-auto" id="monthSelect"></select>
+            <select class="form-select w-auto" id="daySelect"></select>
+            <select class="form-select w-auto" id="hourSelect"></select>
+            <select class="form-select w-auto" id="minuteSelect"></select>
+        </div>
+    </div>
+
+    <!-- 検索タイプ -->
+    <div class="row mb-4" id="searchTypeDiv">
+        <div class="col-12">
+            <div class="d-flex justify-content-start mb-1">
+                <div class="custom-control custom-radio mr-3">
+                    <input name="searchType" class="custom-control-input" id="customRadio1" type="radio"
+                        value="departure" checked>
+                    <label class="custom-control-label" for="customRadio1">出発</label>
+                </div>
+                <div class="custom-control custom-radio mr-3">
+                    <input name="searchType" class="custom-control-input" id="customRadio2" type="radio"
+                        value="arrival">
+                    <label class="custom-control-label" for="customRadio2">到着</label>
+                </div>
+                <div class="custom-control custom-radio mr-3">
+                    <input name="searchType" class="custom-control-input" id="customRadio3" type="radio"
+                        value="firstTrain">
+                    <label class="custom-control-label" for="customRadio3">始発</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input name="searchType" class="custom-control-input" id="customRadio4" type="radio"
+                        value="lastTrain">
+                    <label class="custom-control-label" for="customRadio4">終電</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+    <!-- 詳細設定ボタン -->
+    <div class="row mb-3" id="detailSettingDiv">
+        <div class="col-12">
+            <button class="btn btn-secondary" type="button" id="detailSettingButton">
+                詳細設定
+            </button>
+        </div>
+    </div>
+
+    <!-- 詳細設定パネル -->
+    <div id="detailSetting">
+        <!-- 運賃設定 -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <label class="form-label">運賃種別</label>
+                <select class="form-select" id="preferredTicketOrder">
+                    <option value="ic">ICカード優先</option>
+                    <option value="normal">現金</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">座席種別</label>
+                <select class="form-select" id="surchargeKind">
+                    <option value="reserved">指定席優先</option>
+                    <option value="free" selected>自由席優先</option>
+                    <option value="green">グリーン席優先</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <label>表示料金</label>
+                <select class="form-select" id="priceType">
+                    <option value="oneway">片道</option>
+                    <option value="round">往復</option>
+                    <option value="teiki">定期</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>表示順</label>
+                <select class="form-select" id="sortType">
+                    <option value="time">時間順</option>
+                    <option value="price">料金順</option>
+                    <option value="transfer">乗換回数順</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>乗換時間</label>
+                <select class="form-select" id="transferTime">
+                    <option value="normal">普通</option>
+                    <option value="mostMargin">ゆっくり</option>
+                    <option value="lessMargin">急いで</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <!-- 交通手段 -->
+        <div class="row">
+            <div class="col-12">
+                <label class="form-label">交通手段</label>
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="shinkansen" type="checkbox" checked>
+                                <label class="custom-control-label" for="shinkansen">新幹線</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="limitedExpress" type="checkbox" checked>
+                                <label class="custom-control-label" for="limitedExpress">有料特急</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="localBus" type="checkbox" checked>
+                                <label class="custom-control-label" for="localBus">路線バス</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="highwayBus" type="checkbox" checked>
+                                <label class="custom-control-label" for="highwayBus">高速バス</label>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="plane" type="checkbox" checked>
+                                <label class="custom-control-label" for="plane">飛行機</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="connectionBus" type="checkbox" checked>
+                                <label class="custom-control-label" for="connectionBus">連絡バス</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="liner" type="checkbox" checked>
+                                <label class="custom-control-label" for="liner">ライナー</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="sleeperTrain" type="checkbox" checked>
+                                <label class="custom-control-label" for="sleeperTrain">寝台列車</label>
+                            </div>
+                            <div class="custom-control custom-checkbox mb-3">
+                                <input class="custom-control-input" id="ship" type="checkbox" checked>
+                                <label class="custom-control-label" for="ship">海路</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 検索ボタン -->
+    <div class="row mt-4">
+        <div class="col-md-4 offset-md-4">
+            <button type="button" class="btn btn-default w-100" id="searchButton">検索</button>
+        </div>
+    </div>
+</div>
+
+<!-- 検索結果エリア -->
+<div class="container mt-4">
+    <div id="result" class="custom-hidden"></div>
+</div>

@@ -1,0 +1,132 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% load application_filters %}
+
+{% block title %}
+未提出
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12 col-lg-8">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800">未提出</h1>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">ダッシュボードに戻る</a>
+            </div>
+                
+                <div class="card-body">
+                    {% if unsubmitted_users %}
+                        <div class="list-group">
+                            {% for user_data in unsubmitted_users %}
+                                <div class="list-group-item list-group-item-action user-card d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">
+                                            {{ user_data.user.first_name }}
+                                        </h5>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            入社日: {{ user_data.user.date_of_joining|date:"Y年m月d日" }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            住居・身上確認書未提出
+                                        </p>
+                                        {% if user_data.is_bicycle_commute %}
+                                            <!-- 未提出の申請書を表示 -->
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-exclamation-circle me-1"></i>
+                                                自転車通勤申請書未提出
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success text-center" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>
+                            未提出はいません。
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if unsubmitted_users and user.is_staff %}
+                <div class="card-footer text-center">
+                    <button id="send-reminders" class="btn btn-warning">
+                        <i class="fas fa-bell me-1"></i>リマインダー一括送信
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+    document.getElementById('send-reminders')?.addEventListener('click', function() {
+        Swal.fire({
+            title: 'リマインダー送信',
+            text: '未提出ユーザーにリマインダーメールを送信します。よろしいですか？',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '送信',
+            cancelButtonText: 'キャンセル'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('{% url "notification:send_reminders" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken()
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire(
+                        '送信完了',
+                        data.message,
+                        'success'
+                    );
+                })
+                .catch(error => {
+                    console.log(error)
+                    Swal.fire(
+                        'エラー',
+                        'リマインダーの送信に失敗しました',
+                        'error'
+                    );
+                });
+            }
+        });
+    });
+
+    function getCSRFToken() {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        return cookieValue || '';
+    }
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% block title %}設定{% endblock %}
+{% block content %}
+
+<div class="container-fluid px-4 py-4" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <!-- ヘッダー部分 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-dark"><i class="fa fa-cog fa-lg"></i> 設定</h1>
+            </div>
+            <div class="row">
+                <!-- サイドメニュー -->
+                <nav class="col-md-6 col-lg-4 d-md-block sidebar shadow rounded" style="background-color: #ffffff; padding: 2% 2% 3% 2%; border-radius: 10px;">
+                    <div class="position-sticky">
+                        <ul class="nav flex-column">
+                            <li class="nav-item mb-2">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'settings_home' %}active{% endif %}" href="{% url 'settings:settings_home' %}">
+                                    <i class="fas fa-user-circle me-2"></i> ユーザー情報
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'settings_passwordchange' %}active{% endif %}" href="{% url 'settings:settings_passwordchange' %}">
+                                    <i class="fas fa-lock me-2"></i> パスワード変更
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'email_change' %}active{% endif %}" href="{% url 'settings:email_change' %}">
+                                    <i class="fas fa-envelope me-2"></i> メールアドレス変更
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- メインコンテンツ -->
+                <main class="col-md-6 ms-sm-auto col-lg-8 px-md-4">
+                    <div class="p-4 border rounded shadow d-md-block" style="background-color: #ffffff; border: 1px solid #dee2e6;">
+                        {% block settings_content %}
+                        <!-- ここにコンテンツを表示 -->
+                        {% endblock %}
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_script %}
+<script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- Font Awesome -->
+{% endblock %}

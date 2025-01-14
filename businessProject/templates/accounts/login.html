@@ -1,0 +1,65 @@
+{% extends "request/base.html" %}
+{% load static %}
+{% block title %}ログイン{% endblock %}
+{% block content %}
+
+{% block navbar %}{% endblock %}
+
+<section class="section section-shaped section-lg min-vh-100">
+    <div class="shape shape-style-1 bg-gradient-default">
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <div class="container pt-lg-7">
+      <div class="row justify-content-center">
+        <div class="col-lg-5">
+          <div class="card bg-secondary shadow border-0">
+            <div class="card-body px-lg-5 py-lg-5">
+              <!-- ユーザー名とパスワードが一致しない場合のメッセージ -->
+              {% if form.errors %}
+                <p style="color: red">ユーザー名とパスワードが一致しません。</p>
+              {% endif %}
+              <form role="form" method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="fa fa-id-card"></i></span>
+                    </div>
+                    <input class="form-control" placeholder="ユーザーID" type="text" name="username">
+                  </div>
+                </div>
+                <div class="form-group focused">
+                  <div class="input-group input-group-alternative">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                    </div>
+                    <input class="form-control" placeholder="パスワード" type="password" name="password">
+                  </div>
+                </div>
+                <input type="hidden" name="next" value="{% url 'dashboard' %}">
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary my-3">ログイン</button>
+                </div>
+                <!-- パスワードを忘れた場合のリンク -->
+                <div class="text-center">
+                  <a href="{% url 'accounts:password_reset' %}" class="text-light"><small>パスワードを忘れた場合</small></a>
+                </div>
+
+                <div class="text-center">
+                  <a href="{% url 'route' %}" class="btn btn-outline-primary my-3">経路探索</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
